@@ -1,4 +1,12 @@
-# KDTree
+# KDTree Better Version
+## Note:
+The other version had consistent memory issues so this is a new library without that fault
+
+## Usage:
+1. Type ```g++ testerFile.cpp treeWrapper.cpp  KDTree.cpp -o tester.o && ./tester.o```
+2. Make sure gnuplot is installed
+3. Copy text from plot.plt and run in gnuplot
+
 
 Simple C++ static KD-Tree implementation with minimal functionality.
 
