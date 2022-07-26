@@ -311,7 +311,7 @@ double atan2(std::vector<double> point, std::vector<double> pos)
 
 std::vector<std::vector<double>> InitalPathMerge(std::vector<std::vector<double>> loopPath, std::vector<double> startNode, std::vector<double> endNode, std::vector<std::vector<double>> object)
 {
-  bool CCW = true;
+  bool CW = false;
   std::vector<std::vector<double>> mmObj = minMaxObject(object, startNode);
   std::vector<std::vector<double>> conevec1 = straightLine(mmObj[0], startNode);
   std::vector<std::vector<double>> conevec2 = straightLine(mmObj[1], startNode);
@@ -328,14 +328,13 @@ std::vector<std::vector<double>> InitalPathMerge(std::vector<std::vector<double>
 
   std::vector<std::vector<double>> goalToObjPath = straightLine(startNode, sidePath[intersectIndex]);
   std::vector<std::vector<double>> initialObjPath;
-  if (CCW) {
+  if (CW) {
     intersectIndex -= 1;
-    initialObjPath = slicing(loopPath, 0, intersectIndex);
-    reverse(initialObjPath.begin(), initialObjPath.end());
+    initialObjPath = slicing(sidePath, 0, intersectIndex);
+    initialObjPath = reverseVec(initialObjPath);
   }
-  else initialObjPath = slicing(loopPath, intersectIndex, loopPath.size() - 1);
+  else initialObjPath = slicing(sidePath, intersectIndex, sidePath.size() - 1);
   std::vector<std::vector<double>> fullPath = concatenate(goalToObjPath, initialObjPath);
-  std::cout << "Done!\n";
   for (int i = 0; i < fullPath.size(); i++)
     {
       std::cout << fullPath[i][0] << ' ' << fullPath[i][1] << '\n';

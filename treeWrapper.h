@@ -43,3 +43,5 @@ double atan2(std::vector<double> point, std::vector<double> pos);
 std::vector<double> pathGoalIntersect1(KDTree tree, std::vector<double> startGoal, std::vector<double> endGoal, double rad);
 
 std::vector<std::vector<double>> InitalPathMerge(std::vector<std::vector<double>> loopPath, std::vector<double> startNode, std::vector<double> endNode, std::vector<std::vector<double>> object);
+
+std::vector<std::vector<double>> reverseVec(std::vector<std::vector<double>> vec) ;
