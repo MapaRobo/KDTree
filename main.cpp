@@ -22,7 +22,7 @@ int main() {
 
     KDTree tree = constructkdtree(object);
     std::vector<std::vector<double>> path = KDTreeToPath(tree, rad);
-    InitalPathMerge(path, startGoal, endGoal, object);
+    std::vector<std::vector<double>> initialPath = InitalPathMerge(path, startGoal, endGoal, object);
     //std::vector<double> intersect = pathGoalIntersect1(tree, startGoal, endGoal, rad);
     //loc = intersect;
     //std::vector<double> end = repeatPathLoop(tree, object, path, loc, rad, startGoal, endGoal);
@@ -30,6 +30,6 @@ int main() {
     //std::vector<std::vector<double>> goalLine = straightLine(startGoal, intersect);
     
     plotVec(object, "object.dat");
-    plotVec(path, "path.dat");
+    plotVec(initialPath, "path.dat");
   
 }
