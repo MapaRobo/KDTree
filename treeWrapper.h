@@ -35,7 +35,11 @@ bool intersect(std::vector<double> A, std::vector<double> B, std::vector<double>
 
 std::vector<double> pathGoalIntersect(std::vector<std::vector<double>> path, std::vector<double> startGoal, std::vector<double> endGoal, double meanx, double meany);
 
-std::vector<double> endLocalPath(KDTree tree, std::vector<std::vector<double>> Object, std::vector<std::vector<double>> Entirepath, std::vector<double> startLocation, 
+std::vector<double> repeatPathLoop(KDTree tree, std::vector<std::vector<double>> Object, std::vector<std::vector<double>> Entirepath, std::vector<double> startLocation, 
                                 double rad, std::vector<double> startGoal, std::vector<double> endGoal);
 
 double atan2(std::vector<double> point, std::vector<double> pos);
+
+std::vector<double> pathGoalIntersect1(KDTree tree, std::vector<double> startGoal, std::vector<double> endGoal, double rad);
+
+std::vector<std::vector<double>> InitalPathMerge(std::vector<std::vector<double>> loopPath, std::vector<double> startNode, std::vector<double> endNode, std::vector<std::vector<double>> object);

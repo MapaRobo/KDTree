@@ -84,7 +84,7 @@ void plotVec(std::vector<std::vector<double>> vec, std::string str) {
     file.close();
 }
 
-std::vector<std::vector<double>> straightLine(std::vector<double> point1, std::vector<double> point2) {
+std::vector<std::vector<double>> straightLine(const std::vector<double> point1, const std::vector<double> point2) {
   
   std::vector<std::vector<double>> vecOut;
   double x1 = point1[0]; 
@@ -155,15 +155,11 @@ std::vector<std::vector<double>> sidePathView(std::vector<std::vector<double>> p
   int startIndex = 0;
   int endIndex = path.size() - 1;
   for (int i = 0; i < path.size(); i++) {
-    std::cout << i;
     bool currentValue = lineSegSide(mmCloud[0], mmCloud[1], path[i], loc);
-    if (currentValue) std::cout << " good!";
-    std::cout << "\n";
     if (currentValue == true && prevValue == false) startIndex = i;
     if (currentValue == false && prevValue == true) endIndex = i;
     prevValue = currentValue;
   }
-  std::cout << "Start: " << startIndex << " End: " << endIndex << '\n'; 
 
   bool jump = false;
   if (startIndex > endIndex) jump = true;
@@ -208,19 +204,9 @@ bool intersect(std::vector<double> A, std::vector<double> B, std::vector<double>
     return ccw(A,C,D) != ccw(B,C,D) && ccw(A,B,C) != ccw(A,B,D);
 }
 
-std::vector<double> pathGoalIntersect(std::vector<std::vector<double>> path, std::vector<double> startGoal, std::vector<double> endGoal, double meanx, double meany) { // Take start angle from atan2 must be withing 90 degrees of correct direction
-  double angle = atan2(endGoal[1] - startGoal[1], endGoal[0] - startGoal[0]);
-  for (int i = 0; i < path.size() - 1; i++) {
-    if (intersect(path[i], path[i + 1], startGoal, endGoal)){
-      std::cout << "Intersection!\n";
-    }
-  }
-}
 
-std::vector<double> endLocalPath(KDTree tree, std::vector<std::vector<double>> Object, std::vector<std::vector<double>> Entirepath, std::vector<double> startLocation, double rad, std::vector<double> startGoal, std::vector<double> endGoal) {
-  bool done = false;
-  bool right = true;
-  std::vector<double> loc = startLocation;
+
+std::vector<double> pathGoalIntersect1(KDTree tree, std::vector<double> startGoal, std::vector<double> endGoal, double rad) {
   std::vector<double> PathIntersect = startGoal;
   std::vector<double> slope{endGoal[0] - startGoal[0], endGoal[1] - startGoal[1]};
 
@@ -231,8 +217,36 @@ std::vector<double> endLocalPath(KDTree tree, std::vector<std::vector<double>> O
     double dist = sqrt(distanceSquared(closest, PathIntersect));
     if (dist <= rad) break;
   }
+  return PathIntersect;
+}
 
-  for (int i = 0; i < 2; i++) {
+std::vector<double> repeatPathLoop(KDTree tree, std::vector<std::vector<double>> Object, std::vector<std::vector<double>> Entirepath, const std::vector<double> startLocation, double rad, const std::vector<double> startGoal, const std::vector<double> endGoal) {
+  bool done = false;
+  bool right = true;
+  std::vector<double> loc = startLocation;
+  std::vector<double> slope{endGoal[0] - startGoal[0], endGoal[1] - startGoal[1]};
+  std::vector<double> startLocationNudge = {startLocation[0] + 0.005 * slope[0], startLocation[1] + 0.005 * slope[1]};
+  int turnIndex;
+  for (turnIndex = 0; turnIndex < Entirepath.size() - 1; turnIndex++) {
+    std::cout << turnIndex ;
+    if (intersect(startGoal, startLocationNudge, Entirepath[turnIndex], Entirepath[turnIndex + 1])) {
+      std::cout << ' Done!';
+      break;
+    } 
+    std::cout << '\n';
+  }
+  std::vector<std::vector<double>> newpath;
+  if (right) {
+    newpath = slicing(Entirepath, 0, turnIndex);
+    std::reverse(newpath.begin(),newpath.end());
+  }
+  else newpath = slicing(Entirepath, turnIndex, Entirepath.size() - 1);
+  std::vector<std::vector<double>> pathToObj = straightLine(startGoal, startLocation);
+  std::vector<std::vector<double>> totalFirstPath = concatenate(pathToObj, newpath);
+  plotVec(newpath, "totalFirstPath.dat");
+  loc = totalFirstPath[totalFirstPath.size() - 1];
+
+  for (int i = 1; i < 2; i++) {
     std::vector<std::vector<double>> mmObj = minMaxObject(Object, loc);
     std::vector<std::vector<double>> conevec1 = straightLine(mmObj[0], loc);
     std::vector<std::vector<double>> conevec2 = straightLine(mmObj[1], loc);
@@ -244,8 +258,6 @@ std::vector<double> endLocalPath(KDTree tree, std::vector<std::vector<double>> O
     plotVec(conevec1, "coneleft_" + s + ".dat");
     plotVec(conevec2, "coneright_" + s + ".dat");
 
-    std::cout << sidePath[0][0] << ' ' << sidePath[0][1] << '\n';
-    
     if (right) {
       loc = sidePath[0];
     }
@@ -258,4 +270,16 @@ std::vector<double> endLocalPath(KDTree tree, std::vector<std::vector<double>> O
 
 double atan2(std::vector<double> point, std::vector<double> pos) {
   return atan2(point[1] - pos[1], point[0] - pos[0]);
+}
+
+std::vector<std::vector<double>> InitalPathMerge(std::vector<std::vector<double>> loopPath, std::vector<double> startNode, std::vector<double> endNode, std::vector<std::vector<double>> object) {
+  std::vector<std::vector<double>> mmObj = minMaxObject(object, startNode);
+  std::vector<std::vector<double>> conevec1 = straightLine(mmObj[0], startNode);
+  std::vector<std::vector<double>> conevec2 = straightLine(mmObj[1], startNode);
+  std::vector<std::vector<double>> sidePath = sidePathView(loopPath, startNode, mmObj);
+  for (int i = 0; i < sidePath.size() - 1; i++) {
+    std::cout << intersect(sidePath[i], sidePath[i + 1], startNode, endNode) << ' ' << sidePath[i][1] << '\n';
+  }
+  std::cout << "Done!\n";
+  return object;
 }
