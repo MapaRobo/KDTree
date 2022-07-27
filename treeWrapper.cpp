@@ -251,33 +251,8 @@ std::vector<double> pathGoalIntersect1(KDTree tree, std::vector<double> startGoa
 std::vector<double> repeatPathLoop(KDTree tree, std::vector<std::vector<double>> Object, std::vector<std::vector<double>> Entirepath, const std::vector<double> startLocation, double rad, const std::vector<double> startGoal, const std::vector<double> endGoal)
 {
   bool done = false;
-  bool right = true;
+  bool CCW = true;
   std::vector<double> loc = startLocation;
-  std::vector<double> slope{endGoal[0] - startGoal[0], endGoal[1] - startGoal[1]};
-  std::vector<double> startLocationNudge = {startLocation[0] + 0.005 * slope[0], startLocation[1] + 0.005 * slope[1]};
-  int turnIndex;
-  for (turnIndex = 0; turnIndex < Entirepath.size() - 1; turnIndex++)
-  {
-    std::cout << turnIndex;
-    if (intersect(startGoal, startLocationNudge, Entirepath[turnIndex], Entirepath[turnIndex + 1]))
-    {
-      std::cout << " Done!";
-      break;
-    }
-    std::cout << '\n';
-  }
-  std::vector<std::vector<double>> newpath;
-  if (right)
-  {
-    newpath = slicing(Entirepath, 0, turnIndex);
-    std::reverse(newpath.begin(), newpath.end());
-  }
-  else
-    newpath = slicing(Entirepath, turnIndex, Entirepath.size() - 1);
-  std::vector<std::vector<double>> pathToObj = straightLine(startGoal, startLocation);
-  std::vector<std::vector<double>> totalFirstPath = concatenate(pathToObj, newpath);
-  plotVec(newpath, "totalFirstPath.dat");
-  loc = totalFirstPath[totalFirstPath.size() - 1];
 
   for (int i = 1; i < 2; i++)
   {
@@ -292,7 +267,7 @@ std::vector<double> repeatPathLoop(KDTree tree, std::vector<std::vector<double>>
     plotVec(conevec1, "coneleft_" + s + ".dat");
     plotVec(conevec2, "coneright_" + s + ".dat");
 
-    if (right)
+    if (CCW)
     {
       loc = sidePath[0];
     }
