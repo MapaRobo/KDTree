@@ -6,9 +6,9 @@
 #define PI 3.14159265359
 
 // TODO 
-// 1. Secondary Pathing add in path in correct direction
-// 2. Goal Intersection
-// 3. Adding in yaw to predetermined path
+// 1. Secondary Pathing add in path in correct direction - same logic as before
+// 2. Goal Intersection - More intersection Logic
+// 3. Adding in yaw to predetermined path - Points towards next goal
 
 // Edge Cases
 // 1. Goal covered by object 
