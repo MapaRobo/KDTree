@@ -6,9 +6,7 @@
 #define PI 3.14159265359
 
 // TODO 
-// 1. Secondary Pathing add in path in correct direction - same logic as before
-// 2. Goal Intersection - More intersection Logic
-// 3. Adding in yaw to predetermined path - Points towards next goal
+// 1. Edge Cases
 
 // Edge Cases
 // 1. Goal covered by object 
@@ -24,3 +22,7 @@ int main() {
     std::vector<std::vector<double>> obstacle = createObstacle();
     obstacleAvoidance(obstacle, rad, startGoal, endGoal, CW, loc);
 }
+
+// To run:
+// g++ main.cpp subModules.cpp treeWrapper.cpp KDTree.cpp -o localPlanner.o && ./localPlanner.o
+// Then in gnuplot run the code in gnuplot.plt
