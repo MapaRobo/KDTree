@@ -154,6 +154,7 @@ std::vector<std::vector<double>> minMaxObject(std::vector<std::vector<double>> p
       minAngle = angle;
       minIndex = i;
     }
+    std::cout << angle << ' ' << path[i][0] << ' ' << path[i][1] << ' ' << abs(del) << '\n';
   }
   std::vector<std::vector<double>> mmObj(2);
   mmObj[0] = path[minIndex];
@@ -197,9 +198,7 @@ std::vector<std::vector<double>> sidePathView(std::vector<std::vector<double>> p
   return sidePath;
 }
 
-std::vector<std::vector<double>> slicing(std::vector<std::vector<double>> &arr,
-                                         int X, int Y)
-{
+std::vector<std::vector<double>> slicing(std::vector<std::vector<double>> &arr, int X, int Y) {
   // Starting and Ending iterators
   auto start = arr.begin() + X;
   auto end = arr.begin() + Y + 1;
@@ -264,22 +263,19 @@ std::vector<double> repeatPathLoop(KDTree tree, std::vector<std::vector<double>>
     sidePath = pathSideChoice(sidePath, loc, CW);
     int goalIndex = goalIntersectIndex(sidePath, startGoal, endGoal);
 
-    std::cout << loc[0] << '\n';
-
-
     std::string s = std::to_string(i);
 
-    plotVec(sidePath, "path_" + s + ".dat");
     plotVec(conevec1, "coneleft_" + s + ".dat");
     plotVec(conevec2, "coneright_" + s + ".dat");
     loc = sidePath[sidePath.size() - 1];
     
-    std::cout << loc[0] << '\n';
     if (goalIndex != -1) {
       std::vector<std::vector<double>> lastPath = slicing(sidePath, 0, goalIndex);
       plotVec(lastPath, "path_fin.dat");
       break;
     }
+
+    plotVec(sidePath, "path_" + s + ".dat");
   }
   return loc;
 }
@@ -289,11 +285,9 @@ double atan2(std::vector<double> point, std::vector<double> pos)
   return atan2(point[1] - pos[1], point[0] - pos[0]);
 }
 
-std::vector<std::vector<double>> InitalPathMerge(std::vector<std::vector<double>> loopPath, std::vector<double> startNode, std::vector<double> endNode, std::vector<std::vector<double>> object, bool CW)
+std::vector<std::vector<double>> FindInitialPath(std::vector<std::vector<double>> loopPath, std::vector<double> startNode, std::vector<double> endNode, std::vector<std::vector<double>> object, bool CW)
 {
   std::vector<std::vector<double>> mmObj = minMaxObject(object, startNode);
-  std::vector<std::vector<double>> conevec1 = straightLine(mmObj[0], startNode);
-  std::vector<std::vector<double>> conevec2 = straightLine(mmObj[1], startNode);
   std::vector<std::vector<double>> sidePath = sidePathView(loopPath, startNode, mmObj);
 
   int intersectIndex = 0;
@@ -307,7 +301,7 @@ std::vector<std::vector<double>> InitalPathMerge(std::vector<std::vector<double>
   std::vector<std::vector<double>> goalToObjPath = straightLine(startNode, sidePath[intersectIndex]);
   std::vector<std::vector<double>> initialObjPath;
   if (CW) {
-    intersectIndex -= 1;
+    intersectIndex -= 2;
     initialObjPath = slicing(sidePath, 0, intersectIndex);
     initialObjPath = reverseVec(initialObjPath);
   }
@@ -335,8 +329,6 @@ std::vector<std::vector<double>> pathSideChoice(std::vector<std::vector<double>>
       minManhattenDistance = dist;
     }
   } 
-
-  std::cout << "Min Index: " << minindex << '\n';
   
   std::vector<std::vector<double>> directedPath;
 
